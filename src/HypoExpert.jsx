@@ -41,9 +41,16 @@ function paymentPer1000(annualRate, years) {
 
 function calculate(data) {
   // 1. Revenu total annuel
-  const selfempA = (parseNum(data.revASelfemp2023) + parseNum(data.revASelfemp2024)) / 2;
+  // Travailleur autonome : si revenu 2025 < revenu 2024 → prendre 2025 seulement
+  //                        si revenu 2025 >= revenu 2024 → prendre la moyenne
+  const revA2024 = parseNum(data.revASelfemp2023); // champ label "2024"
+  const revA2025 = parseNum(data.revASelfemp2024); // champ label "2025"
+  const selfempA = revA2025 < revA2024 ? revA2025 : (revA2024 + revA2025) / 2;
+
+  const revB2024 = parseNum(data.revBSelfemp2023);
+  const revB2025 = parseNum(data.revBSelfemp2024);
   const selfempB = data.hasConjoint
-    ? (parseNum(data.revBSelfemp2023) + parseNum(data.revBSelfemp2024)) / 2
+    ? (revB2025 < revB2024 ? revB2025 : (revB2024 + revB2025) / 2)
     : 0;
   const totalIncome =
     parseNum(data.revASalary) +

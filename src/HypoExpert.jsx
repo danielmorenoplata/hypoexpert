@@ -340,6 +340,12 @@ function Intro({ onStart, data, update }) {
         Vos données sont confidentielles et utilisées uniquement pour produire votre estimation. Respecte les normes canadiennes (test de simulation, ratios ABD/ATD, assurance SCHL).
       </p>
 
+      <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <p className="text-xs text-amber-800 leading-relaxed">
+          Les taux d'intérêt affichés sur cette plateforme sont fournis à titre indicatif seulement et sont basés sur une moyenne du marché. Le taux final peut varier selon le profil du client et les conditions des prêteurs.
+        </p>
+      </div>
+
       {/* Paramètres courtier */}
       <div className="mt-8 border-t border-stone-200 pt-6">
         <button
@@ -1280,6 +1286,11 @@ function Merci({ data }) {
       <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
         Cette estimation n'est pas une offre de financement. Seule une institution financière peut émettre une pré-approbation.
       </p>
+      <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4 max-w-xs mx-auto">
+        <p className="text-xs text-amber-800 leading-relaxed">
+          Les taux d'intérêt affichés sur cette plateforme sont fournis à titre indicatif seulement et sont basés sur une moyenne du marché. Le taux final peut varier selon le profil du client et les conditions des prêteurs.
+        </p>
+      </div>
     </div>
   );
 }

@@ -378,13 +378,13 @@ function RevenusPrincipal({ data, update, onNext }) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <CurrencyInput
-                label="Revenu net 2023"
+                label="Revenu net 2024"
                 value={data.revASelfemp2023}
                 onChange={(v) => update({ revASelfemp2023: v })}
                 compact
               />
               <CurrencyInput
-                label="Revenu net 2024"
+                label="Revenu net 2025"
                 value={data.revASelfemp2024}
                 onChange={(v) => update({ revASelfemp2024: v })}
                 compact
@@ -444,13 +444,13 @@ function RevenusConjoint({ data, update, onNext }) {
             <div className="bg-white border border-stone-200 rounded-xl p-4 space-y-3 animate-in">
               <div className="grid grid-cols-2 gap-3">
                 <CurrencyInput
-                  label="Revenu net 2023"
+                  label="Revenu net 2024"
                   value={data.revBSelfemp2023}
                   onChange={(v) => update({ revBSelfemp2023: v })}
                   compact
                 />
                 <CurrencyInput
-                  label="Revenu net 2024"
+                  label="Revenu net 2025"
                   value={data.revBSelfemp2024}
                   onChange={(v) => update({ revBSelfemp2024: v })}
                   compact

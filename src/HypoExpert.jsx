@@ -79,8 +79,11 @@ function calculate(data) {
     maxMonthlyHousing - DEFAULT_HOUSING.hydro - DEFAULT_HOUSING.taxes - DEFAULT_HOUSING.condo;
 
   // 6. Taux de qualification (stress test)
-  const qualFixe = Math.max(RATES.bocFloor, RATES.marketFixe + STRESS_ADD);
-  const qualVar = Math.max(RATES.bocFloor, RATES.marketVariable + STRESS_ADD);
+  const mFixe = (parseNum(data.marketFixe) || RATES.marketFixe * 100) / 100;
+  const mVar  = (parseNum(data.marketVariable) || RATES.marketVariable * 100) / 100;
+  const bFloor = (parseNum(data.bocFloor) || RATES.bocFloor * 100) / 100;
+  const qualFixe = Math.max(bFloor, mFixe + STRESS_ADD);
+  const qualVar  = Math.max(bFloor, mVar  + STRESS_ADD);
 
   // 7. Prêt max (4 scénarios)
   const scenarios = {
@@ -98,9 +101,9 @@ function calculate(data) {
     hydro: DEFAULT_HOUSING.hydro,
     taxes: DEFAULT_HOUSING.taxes,
     condo: DEFAULT_HOUSING.condo,
-    bocFloor: RATES.bocFloor,
-    marketFixe: RATES.marketFixe,
-    marketVariable: RATES.marketVariable,
+    bocFloor: bFloor,
+    marketFixe: mFixe,
+    marketVariable: mVar,
     qualFixe,
     qualVar,
     scenarios,
@@ -158,6 +161,9 @@ export default function HypoExpert() {
     email: "",
     phone: "",
     consent: false,
+    marketFixe: 4.20,
+    marketVariable: 4.30,
+    bocFloor: 5.25,
   });
 
   const TOTAL_STEPS = 7; // intro + 5 questions + results (lead is modal)
@@ -258,7 +264,7 @@ export default function HypoExpert() {
 
       {/* Main content */}
       <main className="max-w-xl mx-auto px-5 pb-32 pt-8">
-        {step === 0 && <Intro onStart={next} />}
+        {step === 0 && <Intro onStart={next} data={data} update={update} />}
         {step === 1 && <RevenusPrincipal data={data} update={update} onNext={next} />}
         {step === 2 && <RevenusConjoint data={data} update={update} onNext={next} />}
         {step === 3 && <Allocations data={data} update={update} onNext={next} />}
@@ -288,7 +294,8 @@ export default function HypoExpert() {
 // ============================================================
 // Étape 0 — Intro
 // ============================================================
-function Intro({ onStart }) {
+function Intro({ onStart, data, update }) {
+  const [showRates, setShowRates] = useState(false);
   return (
     <div className="animate-in pt-4">
       <div className="mb-10">
@@ -332,6 +339,64 @@ function Intro({ onStart }) {
       <p className="text-xs text-slate-400 mt-6 leading-relaxed">
         Vos données sont confidentielles et utilisées uniquement pour produire votre estimation. Respecte les normes canadiennes (test de simulation, ratios ABD/ATD, assurance SCHL).
       </p>
+
+      {/* Paramètres courtier */}
+      <div className="mt-8 border-t border-stone-200 pt-6">
+        <button
+          onClick={() => setShowRates(!showRates)}
+          className="flex items-center gap-2 text-xs text-slate-400 hover:text-blue-900 transition"
+        >
+          <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          Paramètres courtier — Taux du marché
+        </button>
+
+        {showRates && (
+          <div className="mt-4 bg-white border border-stone-200 rounded-xl p-4 space-y-4 animate-in">
+            <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Taux actuels du marché</div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Fixe (%)</label>
+                <input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  max="15"
+                  value={data.marketFixe}
+                  onChange={(e) => update({ marketFixe: e.target.value })}
+                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm tabular focus:outline-none focus:ring-2 focus:ring-blue-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Variable (%)</label>
+                <input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  max="15"
+                  value={data.marketVariable}
+                  onChange={(e) => update({ marketVariable: e.target.value })}
+                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm tabular focus:outline-none focus:ring-2 focus:ring-blue-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 mb-1">Plancher BdC (%)</label>
+                <input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  max="15"
+                  value={data.bocFloor}
+                  onChange={(e) => update({ bocFloor: e.target.value })}
+                  className="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm tabular focus:outline-none focus:ring-2 focus:ring-blue-900"
+                />
+              </div>
+            </div>
+            <p className="text-[11px] text-slate-400">Taux de qualification = max(Plancher BdC, Taux du marché + 2%)</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

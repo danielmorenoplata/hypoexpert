@@ -142,9 +142,19 @@ function fmtMoneyPrecise(n) {
 // ============================================================
 // Main App
 // ============================================================
+const RATES_KEY = "hypoexpert_rates";
+function loadSavedRates() {
+  try {
+    const saved = localStorage.getItem(RATES_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return { marketFixe: 4.20, marketVariable: 4.30, bocFloor: 5.25 };
+}
+
 export default function HypoExpert() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [step, setStep] = useState(0);
+  const savedRates = loadSavedRates();
   const [data, setData] = useState({
     revASalary: "",
     revAIsSelfemp: false,
@@ -168,15 +178,29 @@ export default function HypoExpert() {
     email: "",
     phone: "",
     consent: false,
-    marketFixe: 4.20,
-    marketVariable: 4.30,
-    bocFloor: 5.25,
+    marketFixe: savedRates.marketFixe,
+    marketVariable: savedRates.marketVariable,
+    bocFloor: savedRates.bocFloor,
   });
 
   const TOTAL_STEPS = 7; // intro + 5 questions + results (lead is modal)
   const progress = step === 0 ? 0 : Math.min((step / (TOTAL_STEPS - 1)) * 100, 100);
 
-  const update = (patch) => setData((d) => ({ ...d, ...patch }));
+  const update = (patch) => {
+    setData((d) => {
+      const next = { ...d, ...patch };
+      if ("marketFixe" in patch || "marketVariable" in patch || "bocFloor" in patch) {
+        try {
+          localStorage.setItem(RATES_KEY, JSON.stringify({
+            marketFixe: next.marketFixe,
+            marketVariable: next.marketVariable,
+            bocFloor: next.bocFloor,
+          }));
+        } catch {}
+      }
+      return next;
+    });
+  };
   const next = () => setStep((s) => s + 1);
   const back = () => setStep((s) => Math.max(0, s - 1));
 

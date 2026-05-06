@@ -226,7 +226,7 @@ export default function HypoExpert() {
                 <a href="mailto:ronny.aguilera@groupeih.ca" className="text-[11px] text-blue-900 font-medium">ronny.aguilera@groupeih.ca</a>
               </div>
             </div>
-            {step > 0 && step < 6 && (
+            {(step > 0 && step < 6 || step === 7) && (
               <button
                 onClick={back}
                 className="text-sm text-slate-500 hover:text-blue-900 transition"
